@@ -13,11 +13,10 @@ try:
 except sqlite3.OperationalError as e:
     raise Exception("Can't create the table in the DB: " + str(e))
 
-widgets = []
-
 class WidgetsHandler(RequestHandler):
     def get(self):
-        self.write({'widgets': widgets})
+        c.execute('SELECT * FROM widgets')
+        self.write(json.dumps(c.fetchall()))
 
 class WidgetHandler(RequestHandler):
     def post(self):
