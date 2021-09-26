@@ -9,7 +9,7 @@ conn = sqlite3.connect('.widgets.db')
 c = conn.cursor()
 
 try:
-    c.execute('''CREATE TABLE IF NOT EXISTS widgets (name TEXT, number_parts INT, created TEXT, updated TEXT)''')
+    c.execute('''CREATE TABLE IF NOT EXISTS widgets (id INTEGER PRIMARY KEY, name TEXT, number_parts INT, created TEXT, updated TEXT)''')
 except sqlite3.OperationalError as e:
     raise Exception("Can't create the table in the DB: " + str(e))
 
