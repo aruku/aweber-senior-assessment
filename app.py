@@ -24,16 +24,23 @@ class WidgetHandler(RequestHandler):
         name = body_decoded["name"]
         number_parts = body_decoded["number_parts"]
         if len(name) > 64:
-            self.write("Name is longer than 64 characters")
-            return
+            self.set_status(400)
+            self.finish("Name is longer than 64 characters")
         if not isinstance(number_parts, int):
-            self.write("NUmber of parts is not an integer")
-            return
+            self.set_status(400)
+            self.finish("Number of parts is not an integer")
+
         date_created = datetime.datetime.now()
         c.execute("INSERT INTO widgets (name, number_parts, created) VALUES (?, ?, ?)", (name, number_parts, date_created))
         conn.commit()
 
     def delete(self, id):
+        c.execute("SELECT * FROM widgets WHERE id=?", [id])
+        result = c.fetchone()
+        if result == None:
+            self.set_status(404)
+            self.finish("The ID supplied doesn't exist")
+
         c.execute("DELETE FROM widgets WHERE id=?", [id])
         conn.commit()
 
