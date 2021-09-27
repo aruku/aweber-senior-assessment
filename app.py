@@ -23,6 +23,12 @@ class WidgetHandler(RequestHandler):
         body_decoded = json.loads(self.request.body)
         name = body_decoded["name"]
         number_parts = body_decoded["number_parts"]
+        if len(name) > 64:
+            self.write("Name is longer than 64 characters")
+            return
+        if not isinstance(number_parts, int):
+            self.write("NUmber of parts is not an integer")
+            return
         date_created = datetime.datetime.now()
         c.execute("INSERT INTO widgets (name, number_parts, created) VALUES (?, ?, ?)", (name, number_parts, date_created))
         conn.commit()
