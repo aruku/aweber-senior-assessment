@@ -28,3 +28,17 @@ POST, PUT http://localhost:3000/api/widget/id {
   "number_parts": 8
 }
 ```
+
+### Static analyzers
+
+Use pipenv to install the dev dependencies:
+
+```bash
+pipenv install --dev
+```
+
+Run them with:
+
+```bash
+pipenv run pep8 --show-source app.py
+```

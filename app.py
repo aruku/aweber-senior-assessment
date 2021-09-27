@@ -9,14 +9,17 @@ conn = sqlite3.connect('.widgets.db')
 c = conn.cursor()
 
 try:
-    c.execute('''CREATE TABLE IF NOT EXISTS widgets (id INTEGER PRIMARY KEY, name TEXT, number_parts INT, created TEXT, updated TEXT)''')
+    c.execute('''CREATE TABLE IF NOT EXISTS widgets (id INTEGER PRIMARY KEY,
+        name TEXT, number_parts INT, created TEXT, updated TEXT)''')
 except sqlite3.OperationalError as e:
     raise Exception("Can't create the table in the DB: " + str(e))
+
 
 class WidgetsHandler(RequestHandler):
     def get(self):
         c.execute('SELECT * FROM widgets')
         self.finish(json.dumps(c.fetchall()))
+
 
 class WidgetHandler(RequestHandler):
     def get(self, id):
@@ -26,7 +29,7 @@ class WidgetHandler(RequestHandler):
     def getwidgetorfinish(self, id):
         c.execute("SELECT * FROM widgets WHERE id=?", [id])
         result = c.fetchone()
-        if result == None:
+        if result is None:
             self.set_status(404)
             self.finish("The ID supplied doesn't exist")
         return result
@@ -36,7 +39,8 @@ class WidgetHandler(RequestHandler):
         self.validate(name, number_parts)
 
         date_created = datetime.datetime.now()
-        c.execute("INSERT INTO widgets (name, number_parts, created) VALUES (?, ?, ?)", (name, number_parts, date_created))
+        c.execute("INSERT INTO widgets (name, number_parts, created) VALUES (?, ?, ?)",
+                  (name, number_parts, date_created))
         conn.commit()
 
     def put(self, id):
@@ -45,7 +49,8 @@ class WidgetHandler(RequestHandler):
         self.validate(name, number_parts)
 
         date_updated = datetime.datetime.now()
-        c.execute("UPDATE widgets SET name=?, number_parts=?, updated=? WHERE id=?", (name, number_parts, date_updated, id))
+        c.execute("UPDATE widgets SET name=?, number_parts=?, updated=? WHERE id=?",
+                  (name, number_parts, date_updated, id))
         conn.commit()
 
     def decodebody(self):
@@ -66,6 +71,7 @@ class WidgetHandler(RequestHandler):
         self.getwidgetorfinish(id)
         c.execute("DELETE FROM widgets WHERE id=?", [id])
         conn.commit()
+
 
 def make_app():
     urls = [
