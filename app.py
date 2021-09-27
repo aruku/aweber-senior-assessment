@@ -19,7 +19,16 @@ class WidgetsHandler(RequestHandler):
         self.write(json.dumps(c.fetchall()))
 
 class WidgetHandler(RequestHandler):
-    def post(self):
+    def get(self, id):
+        c.execute("SELECT * FROM widgets WHERE id=?", [id])
+        result = c.fetchone()
+        if result == None:
+            self.set_status(404)
+            self.finish("The ID supplied doesn't exist")
+
+        self.write(json.dumps(result))
+
+    def post(self, id=None):
         body_decoded = json.loads(self.request.body)
         name = body_decoded["name"]
         number_parts = body_decoded["number_parts"]
@@ -32,6 +41,27 @@ class WidgetHandler(RequestHandler):
 
         date_created = datetime.datetime.now()
         c.execute("INSERT INTO widgets (name, number_parts, created) VALUES (?, ?, ?)", (name, number_parts, date_created))
+        conn.commit()
+
+    def put(self, id):
+        c.execute("SELECT * FROM widgets WHERE id=?", [id])
+        result = c.fetchone()
+        if result == None:
+            self.set_status(404)
+            self.finish("The ID supplied doesn't exist")
+
+        body_decoded = json.loads(self.request.body)
+        name = body_decoded["name"]
+        number_parts = body_decoded["number_parts"]
+        if len(name) > 64:
+            self.set_status(400)
+            self.finish("Name is longer than 64 characters")
+        if not isinstance(number_parts, int):
+            self.set_status(400)
+            self.finish("Number of parts is not an integer")
+
+        date_updated = datetime.datetime.now()
+        c.execute("UPDATE widgets SET name=?, number_parts=?, updated=? WHERE id=?", (name, number_parts, date_updated, id))
         conn.commit()
 
     def delete(self, id):
@@ -47,8 +77,7 @@ class WidgetHandler(RequestHandler):
 def make_app():
     urls = [
         ("/api/widgets/", WidgetsHandler),  # List
-        ("/api/widget/", WidgetHandler),  # Create
-        (r"/api/widget/([^/]+)?", WidgetHandler),  # Delete
+        (r"/api/widget/([^/]+)?", WidgetHandler),  # Read, create, update, delete
     ]
     return Application(urls, debug=True)
 
