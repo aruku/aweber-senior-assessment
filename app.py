@@ -33,10 +33,15 @@ class WidgetHandler(RequestHandler):
         c.execute("INSERT INTO widgets (name, number_parts, created) VALUES (?, ?, ?)", (name, number_parts, date_created))
         conn.commit()
 
+    def delete(self, id):
+        c.execute("DELETE FROM widgets WHERE id=?", [id])
+        conn.commit()
+
 def make_app():
     urls = [
-        ("/api/widgets/", WidgetsHandler),
-        ("/api/widget/", WidgetHandler),
+        ("/api/widgets/", WidgetsHandler),  # List
+        ("/api/widget/", WidgetHandler),  # Create
+        (r"/api/widget/([^/]+)?", WidgetHandler),  # Delete
     ]
     return Application(urls, debug=True)
 
