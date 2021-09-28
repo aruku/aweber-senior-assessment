@@ -22,11 +22,11 @@ class WidgetsHandler(RequestHandler):
 
 
 class WidgetHandler(RequestHandler):
-    def get(self, id):
+    def get(self, id: int):
         result = self.getwidgetorfinish(id)
         self.finish(json.dumps(result))
 
-    def getwidgetorfinish(self, id):
+    def getwidgetorfinish(self, id: int):
         c.execute("SELECT * FROM widgets WHERE id=?", [id])
         result = c.fetchone()
         if result is None:
@@ -34,7 +34,7 @@ class WidgetHandler(RequestHandler):
             self.finish("The ID supplied doesn't exist")
         return result
 
-    def post(self, id=None):
+    def post(self, id: int = 0):
         name, number_parts = self.decodebody()
         self.validate(name, number_parts)
 
@@ -43,7 +43,7 @@ class WidgetHandler(RequestHandler):
                   (name, number_parts, date_created))
         conn.commit()
 
-    def put(self, id):
+    def put(self, id: int):
         self.getwidgetorfinish(id)
         name, number_parts = self.decodebody()
         self.validate(name, number_parts)
@@ -59,7 +59,7 @@ class WidgetHandler(RequestHandler):
         number_parts = body_decoded["number_parts"]
         return name, number_parts
 
-    def validate(self, name, number_parts):
+    def validate(self, name: str, number_parts: str) -> None:
         if len(name) > 64:
             self.set_status(400)
             self.finish("Name is longer than 64 characters")
@@ -67,7 +67,7 @@ class WidgetHandler(RequestHandler):
             self.set_status(400)
             self.finish("Number of parts is not an integer")
 
-    def delete(self, id):
+    def delete(self, id: int):
         self.getwidgetorfinish(id)
         c.execute("DELETE FROM widgets WHERE id=?", [id])
         conn.commit()
