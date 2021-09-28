@@ -3,6 +3,8 @@ from tornado.ioloop import IOLoop
 import json
 import sqlite3
 import datetime
+import swagger_ui
+from init_swagger import generate_swagger_file
 
 # Initialize components
 conn = sqlite3.connect('.widgets.db')
@@ -13,6 +15,8 @@ try:
         name TEXT, number_parts INT, created TEXT, updated TEXT)''')
 except sqlite3.OperationalError as e:
     raise Exception("Can't create the table in the DB: " + str(e))
+
+SWAGGER_API_OUTPUT_FILE = "./swagger.json"
 
 
 class WidgetsHandler(RequestHandler):
@@ -78,7 +82,23 @@ def make_app():
         ("/api/widgets/", WidgetsHandler),  # List
         (r"/api/widget/([^/]+)?", WidgetHandler),  # Read, create, update, delete
     ]
-    return Application(urls, debug=True)
+
+    # Initialize Tornado application
+    app = Application(urls, debug=True)
+
+    # Generate a fresh Swagger file
+    generate_swagger_file(handlers=urls, file_location=SWAGGER_API_OUTPUT_FILE)
+
+    # Start the Swagger UI. Automatically generated swagger.json can also
+    # be served using a separate Swagger-service.
+    swagger_ui.tornado_api_doc(
+        app,
+        config_path=SWAGGER_API_OUTPUT_FILE,
+        url_prefix="/swagger/spec.html",
+        title="Car Brand API",
+    )
+
+    return app
 
 
 if __name__ == '__main__':

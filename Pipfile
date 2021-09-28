@@ -5,6 +5,10 @@ name = "pypi"
 
 [packages]
 tornado = "*"
+apispec = "*"
+apispec-webframeworks = "*"
+marshmallow = "*"
+swagger-ui-py = "*"
 
 [dev-packages]
 pep8 = "*"
