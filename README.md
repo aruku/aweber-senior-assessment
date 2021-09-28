@@ -42,4 +42,5 @@ Run them with:
 ```bash
 pipenv run pep8 --show-source app.py
 pipenv run bandit -r app.py
+pipenv run flake8 app.py
 ```

@@ -9,6 +9,7 @@ tornado = "*"
 [dev-packages]
 pep8 = "*"
 bandit = "*"
+flake8 = "*"
 
 [requires]
 python_version = "3.9"
